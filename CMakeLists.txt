@@ -26,4 +26,4 @@ SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall -std=c++11")
 aux_source_directory(. DIR_SRCS)
 
 # 指定生成目标
-add_executable(future_net ${DIR_SRCS} ant/ant.cpp ant/ant.h)
+add_executable(future_net ${DIR_SRCS} ant/ant.cpp ant/ant.h ant/TSP.cpp ant/TSP.h)
