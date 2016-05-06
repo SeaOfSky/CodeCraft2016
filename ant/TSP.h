@@ -28,7 +28,7 @@ public:
     void InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial);
 
     //开始搜索
-    void Search(Demand & demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial);
+    void Search(Demand & demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial, int index);
 
     //更新环境信息素
     void UpdateTrial(double **g_Trial);

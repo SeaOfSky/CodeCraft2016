@@ -5,9 +5,11 @@
 #include "./ant/TSP.h"
 
 #include <stdio.h>
+#include <time.h>
 #include <algorithm>
 
 int N_CITY_COUNT; //城市数量
+clock_t start_time;
 
 void demanNoTuba(std::vector<EdgeList> adj_vec, Demand & demand, std::vector<int> &TubaVec, int num_node)
 {
@@ -85,6 +87,8 @@ void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAN
 //    }
 
 
+    start_time = clock();
+
     /*----------建立邻接链表------*/
     int num_node = 0;
     std::vector<EdgeList> adj_vec = read_graph(topo, edge_num);
@@ -95,10 +99,10 @@ void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAN
     num_node = adj_vec.size();
 
     /*--------------预处理---------*/
-
-    std::vector<int> TubaVec;
-    demanNoTuba(adj_vec, deman_vec[0], TubaVec, num_node);
-    pre_process(&adj_vec, num_node, TubaVec);
+//
+//    std::vector<int> TubaVec;
+//    demanNoTuba(adj_vec, deman_vec[0], TubaVec, num_node);
+//    pre_process(&adj_vec, num_node, TubaVec);
 
 
     /*************** NA ******************/
@@ -115,37 +119,31 @@ void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAN
 //        }
 //    }
 
-    Path best_path;
+    Path best_path[2];
+
+    for(int index = 0; index < demand_num; index++)
+    {
+        /*方式二-----------蚁群寻路---------*/
+        double **g_Trial; //两两城市间信息素，就是环境信息素
+        g_Trial = (double **) malloc(sizeof(double *) * num_node);
+        for (int i = 0; i < num_node; i++)
+            g_Trial[i] = (double *) malloc(sizeof(double) * num_node);
+
+        double **g_Distance; //两两城市间距离
+        g_Distance = (double **) malloc(sizeof(double *) * num_node);
+        for (int i = 0; i < num_node; i++)
+            g_Distance[i] = (double *) malloc(sizeof(double) * num_node);
 
 
-    /*方式二-----------蚁群寻路---------*/
-    double **g_Trial; //两两城市间信息素，就是环境信息素
-    g_Trial = (double **) malloc(sizeof(double *) * num_node);
-    for (int i = 0; i < num_node; i++)
-        g_Trial[i] = (double *) malloc(sizeof(double) * num_node);
+        CTsp tsp;
+        tsp.InitData(num_node, adj_vec, g_Distance, g_Trial); //初始化
+        tsp.Search(deman_vec[index], adj_vec, g_Distance, g_Trial, index); //开始搜索
 
-    double **g_Distance; //两两城市间距离
-    g_Distance = (double **) malloc(sizeof(double *) * num_node);
-    for (int i = 0; i < num_node; i++)
-        g_Distance[i] = (double *) malloc(sizeof(double) * num_node);
+        best_path[index] = NodenoIndexPath(adj_vec, tsp.m_cBestAnt);
+    }
 
-
-    CTsp tsp;
-    tsp.InitData(num_node, adj_vec, g_Distance, g_Trial); //初始化
-    tsp.Search(deman_vec[0], adj_vec, g_Distance, g_Trial); //开始搜索
-//    //输出路径结果，以顶点名表示
-//    printf("\nThe start point is: %d , The end point is: %d\n\n", st, en);
-//    if (tsp.m_cBestAnt.m_dbPathLength == DB_MAX) {
-//        printf("NA\n");
-//        return;
-//    }
-
-    printf("Vertex represents the best path:  ");
-    for (int i = 0; i < tsp.m_cBestAnt.m_nMovedCityCount - 1; i++)
-        printf("%d-> ", tsp.m_cBestAnt.m_nPath[i]);
-    printf("%d ", tsp.m_cBestAnt.m_nPath[tsp.m_cBestAnt.m_nMovedCityCount - 1]);
-
-    best_path = NodenoIndexPath(adj_vec, tsp.m_cBestAnt);
-
-
+    for(int i = 0 ; i < best_path[0].edgeID.size(); i++)
+        record_result(WORK_PATH, (unsigned short)best_path[0].edgeID[i]);
+    for(int i = 0 ; i < best_path[1].edgeID.size(); i++)
+        record_result(BACK_PATH, (unsigned short)best_path[1].edgeID[i]);
 }

@@ -5,9 +5,11 @@
 #include "TSP.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <memory.h>
 
 extern int N_CITY_COUNT; //城市数量
+extern clock_t start_time;
 
 //构造函数
 CTsp::CTsp(void)
@@ -98,15 +100,9 @@ void CTsp::UpdateTrial(double **g_Trial)
 }
 
 
-void CTsp::Search(Demand & demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial)
+void CTsp::Search(Demand & demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial, int index)
 {
-
-    vector<int> deman_vec = demand.pass;
-
-    char cBuf[256]; //打印信息用
-
-    int out_ms, total_ms = 0;
-//    timer(out_ms);
+    clock_t end_time;
 
     //在迭代次数内进行循环
     for (int i = 0; i<N_IT_COUNT; i++)
@@ -128,18 +124,15 @@ void CTsp::Search(Demand & demand, std::vector<EdgeList> adj_vec, double **g_Dis
                 m_cBestAnt = m_cAntAry[j];
             }
         }
-//        timer(out_ms);
-        total_ms += out_ms;
-        if (total_ms > ThresholdTime_ms)
-            return;
 
         //更新环境信息素
         UpdateTrial(g_Trial);
 
-        //输出目前为止找到的最优路径的长度以及蚂蚁数量
-        sprintf(cBuf, "\n[%d] %.0f", i + 1, m_cBestAnt.m_dbPathLength);
-        printf(cBuf);
-        printf("\nThe number of ants is %d, The number of dead ants is %d\n ", N_ANT_COUNT, dead_ants);
+        end_time = clock();
+        if((double)(end_time - start_time)/CLOCKS_PER_SEC > (index + 1) * 5 - 1)
+            break;
     }
+
+//    printf("%lf\n", (double)(end_time - start_time)/CLOCKS_PER_SEC);
 
 }
