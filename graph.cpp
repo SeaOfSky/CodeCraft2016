@@ -66,18 +66,18 @@ vector<Demand> read_demand(char * demand[MAX_DEMAND_NUM], int demand_num)
     {
         Demand temp;
 
-        char * split[3];
+        char * split[4];
         char * str = strtok(demand[i], ",");
-        for(int j = 0; j < 3; j++)
+        for(int j = 0; j < 4; j++)
         {
             split[j] = str;
             str = strtok(NULL, ",");
         }
 
-        temp.start = atoi(split[0]);
-        temp.end = atoi(split[1]);
+        temp.start = atoi(split[1]);
+        temp.end = atoi(split[2]);
 
-        str = strtok(split[2], "|");
+        str = strtok(split[3], "|");
         while(str)
         {
             temp.pass.push_back(atoi(str));
