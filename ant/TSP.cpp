@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <memory.h>
 
+extern int N_CITY_COUNT; //城市数量
+
 //构造函数
 CTsp::CTsp(void)
 {
@@ -96,8 +98,10 @@ void CTsp::UpdateTrial(double **g_Trial)
 }
 
 
-void CTsp::Search(std::vector<int> deman_vec, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial)
+void CTsp::Search(Demand & demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial)
 {
+
+    vector<int> deman_vec = demand.pass;
 
     char cBuf[256]; //打印信息用
 
@@ -111,7 +115,7 @@ void CTsp::Search(std::vector<int> deman_vec, std::vector<EdgeList> adj_vec, dou
         //每只蚂蚁搜索一遍
         for (int j = 0; j<N_ANT_COUNT; j++)
         {
-            m_cAntAry[j].Search(deman_vec, adj_vec, g_Distance, g_Trial);
+            m_cAntAry[j].Search(demand, adj_vec, g_Distance, g_Trial);
             if (m_cAntAry[j].m_dbPathLength == DB_MAX)
                 dead_ants++;
         }

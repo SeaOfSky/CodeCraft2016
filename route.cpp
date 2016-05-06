@@ -7,8 +7,11 @@
 #include <stdio.h>
 #include <algorithm>
 
-void demanNoTuba(std::vector<EdgeList> adj_vec, std::vector<int> deman_vec, std::vector<int> &TubaVec, int num_node)
+int N_CITY_COUNT; //城市数量
+
+void demanNoTuba(std::vector<EdgeList> adj_vec, Demand & demand, std::vector<int> &TubaVec, int num_node)
 {
+    vector<int> deman_vec = demand.pass;
     while (1) {
         int count = 0;
         for (int i = 0; i < deman_vec.size(); i++) {
@@ -81,10 +84,6 @@ void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAN
 //        record_result(BACK_PATH, result2[i]);
 //    }
 
-    read_graph(topo, edge_num);
-    read_demand(demand, demand_num);
-
-
 
     /*----------建立邻接链表------*/
     int num_node = 0;
@@ -93,10 +92,12 @@ void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAN
     /*----------分析需求点集------*/
     std::vector<Demand> deman_vec = read_demand(demand, demand_num);
 
+    num_node = adj_vec.size();
+
     /*--------------预处理---------*/
 
     std::vector<int> TubaVec;
-    demanNoTuba(adj_vec, deman_vec[0].pass, TubaVec, num_node);
+    demanNoTuba(adj_vec, deman_vec[0], TubaVec, num_node);
     pre_process(&adj_vec, num_node, TubaVec);
 
 
@@ -131,13 +132,13 @@ void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAN
 
     CTsp tsp;
     tsp.InitData(num_node, adj_vec, g_Distance, g_Trial); //初始化
-    tsp.Search(deman_vec[0].pass, adj_vec, g_Distance, g_Trial); //开始搜索
-    //输出路径结果，以顶点名表示
-    printf("\nThe start point is: %d , The end point is: %d\n\n", st, en);
-    if (tsp.m_cBestAnt.m_dbPathLength == DB_MAX) {
-        printf("NA\n");
-        return;
-    }
+    tsp.Search(deman_vec[0], adj_vec, g_Distance, g_Trial); //开始搜索
+//    //输出路径结果，以顶点名表示
+//    printf("\nThe start point is: %d , The end point is: %d\n\n", st, en);
+//    if (tsp.m_cBestAnt.m_dbPathLength == DB_MAX) {
+//        printf("NA\n");
+//        return;
+//    }
 
     printf("Vertex represents the best path:  ");
     for (int i = 0; i < tsp.m_cBestAnt.m_nMovedCityCount - 1; i++)

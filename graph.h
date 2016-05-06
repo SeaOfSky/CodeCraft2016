@@ -10,7 +10,7 @@
 #include <vector>
 #include <list>
 
-#define MAX_NODE_NUM 5
+#define MAX_NODE_NUM 2000
 #define MAX(x,y) ((x)>(y)?(x):(y))
 
 using namespace std;

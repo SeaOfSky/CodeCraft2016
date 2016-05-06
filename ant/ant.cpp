@@ -5,6 +5,8 @@
 #include "ant.h"
 #include <algorithm>
 
+extern int N_CITY_COUNT; //城市数量
+
 //返回指定范围内的随机整数
 int rnd(int nLow, int nUpper)
 {
@@ -31,11 +33,16 @@ CAnt::~CAnt(void)
 }
 
 //初始化函数，蚂蚁搜索前调用
-void CAnt::Init(std::vector<int> deman_vec, std::vector<EdgeList> adj_vec)
+void CAnt::Init(Demand & demand, std::vector<EdgeList> adj_vec)
 {
+    std::vector<int> deman_vec = demand.pass;
+
     m_nPath = (int*)malloc(sizeof(int)*N_CITY_COUNT);
     m_nAllowedCity = (int*)malloc(sizeof(int)*N_CITY_COUNT);
     m_nDemanCity = (int*)malloc(sizeof(int)*N_CITY_COUNT);
+
+    start = demand.start;
+    end = demand.end;
 
     for (int i = 0; i<N_CITY_COUNT; i++)
     {
@@ -45,7 +52,7 @@ void CAnt::Init(std::vector<int> deman_vec, std::vector<EdgeList> adj_vec)
 
     for (int i = 0; i < N_CITY_COUNT; i++)
     {
-        if((adj_vec[i].size()==0)&&(i!=en))
+        if((adj_vec[i].size()==0)&&(i!=demand.end))
             m_nAllowedCity[i] = 0;//设置陷阱为已经去过
     }
 
@@ -63,7 +70,7 @@ void CAnt::Init(std::vector<int> deman_vec, std::vector<EdgeList> adj_vec)
 
     //随机选择一个出发城市
     //m_nCurCityNo = rnd(0, N_CITY_COUNT);
-    m_nCurCityNo = st;
+    m_nCurCityNo = demand.start;
 
     //把出发城市保存入路径数组中
     m_nPath[0] = m_nCurCityNo;
@@ -116,7 +123,7 @@ int CAnt::ChooseNextCity(double **g_Distance, double **g_Trial, int deman_count,
             }
 
 
-            if ((deman_count != deman_node_count) && (i == en))//若需要经过的点还没走完且选择的新节点是终点，则该点不走
+            if ((deman_count != deman_node_count) && (i == end))//若需要经过的点还没走完且选择的新节点是终点，则该点不走
                 prob[i] = 0.0;
 
             dbTotal = dbTotal + prob[i]; //累加信息素，得到总和
@@ -192,14 +199,16 @@ int CAnt::Move(double **g_Distance, double **g_Trial, int deman_count, int deman
 }
 
 //蚂蚁进行搜索一次
-void CAnt::Search(std::vector<int> deman_vec, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial)
+void CAnt::Search(Demand & demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial)
 {
-    Init(deman_vec, adj_vec); //蚂蚁搜索前，先初始化
+    Init(demand, adj_vec); //蚂蚁搜索前，先初始化
+
+    std::vector<int> deman_vec = demand.pass;
 
     //如果蚂蚁去过的城市未经过所有必经城市，且当前城市不是最终城市，就继续移动
-    int deman_node_count = deman_vec.size();
+    int deman_node_count = (int)deman_vec.size();
     int deman_count = 0;
-    while ((m_nCurCityNo != en) || (deman_count != deman_node_count))
+    while ((m_nCurCityNo != end) || (deman_count != deman_node_count))
     {
         int rt = Move(g_Distance, g_Trial, deman_count, deman_node_count);
         if (rt == 0)

@@ -7,6 +7,9 @@
 
 #include "ant.h"
 
+const int N_ANT_COUNT = 20; //蚂蚁数量
+const int N_IT_COUNT = 20000; //迭代次数
+
 //tsp类
 class CTsp
 {
@@ -25,7 +28,7 @@ public:
     void InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial);
 
     //开始搜索
-    void Search(std::vector<int> deman_vec, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial);
+    void Search(Demand & demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial);
 
     //更新环境信息素
     void UpdateTrial(double **g_Trial);
