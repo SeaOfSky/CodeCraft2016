@@ -1,8 +1,8 @@
 #include "route.h"
 #include "lib_record.h"
 #include "graph.h"
-#include "./ant/ant.h"
-#include "./ant/TSP.h"
+#include "ant.h"
+#include "TSP.h"
 
 #include <stdio.h>
 #include <time.h>

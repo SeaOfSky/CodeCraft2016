@@ -6,7 +6,7 @@
 #define FUTURE_NET_ANT_H
 
 #include <vector>
-#include "../graph.h"
+#include "graph.h"
 
 const double ALPHA = 1.0; //启发因子，信息素的重要程度
 const double BETA = 0.6;   //期望因子，城市间距离的重要程度
