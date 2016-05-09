@@ -39,8 +39,8 @@ void CTsp::InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Dist
     // 先把最优蚂蚁的路径长度设置成一个很大的值
     m_cBestAnt.m_dbPathLength = DB_MAX;
     N_NODE_COUNT = num_node;
+
     // 计算两两城市间距离
-    double dbTemp = 0.0;
     for (int i = 0; i < N_NODE_COUNT; i++)
     {
         for (int j = 0; j < N_NODE_COUNT; j++)
@@ -147,6 +147,11 @@ void CTsp::Search(Demand &demand, std::vector<EdgeList> adj_vec, double **g_Dist
                 m_cBestAnt = m_cAntAry[j];
             }
         }
+
+//        if(m_cBestAnt.m_dbPathLength == DB_MAX)
+//            m_cBestAnt = temp_best_ant;
+//        else if(m_cBestAnt.m_dbPathLength == temp_min)
+//            break;
 
         // 更新环境信息素
         UpdateTrial(g_Trial);

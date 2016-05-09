@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <algorithm>
+#include <iostream>
 
 int N_NODE_COUNT;       // 节点总数
 clock_t start_time;     // 程序开始时间
@@ -48,11 +49,11 @@ void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAN
     {
         double **g_Trial;                                               // 两两城市间信息素，即环境信息素
         double **g_Distance;                                            // 两两城市间距离
-        g_Trial = (double **) malloc(sizeof(double *) * num_node);
+        g_Trial    = (double **) malloc(sizeof(double *) * num_node);
         g_Distance = (double **) malloc(sizeof(double *) * num_node);
         for (int i = 0; i < num_node; i++)
         {
-            g_Trial[i] = (double *) malloc(sizeof(double) * num_node);
+            g_Trial[i]    = (double *) malloc(sizeof(double) * num_node);
             g_Distance[i] = (double *) malloc(sizeof(double) * num_node);
         }
 
@@ -72,9 +73,10 @@ void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAN
         free(g_Distance);
     }
 
-    for(int i = 0 ; i < best_path[0].edgeID.size(); i++)                    // 将最优路径信息写入文件
+    for(int i = 0 ; i < (int)best_path[0].edgeID.size(); i++)               // 将最优路径信息写入文件
         record_result(WORK_PATH, (unsigned short)best_path[0].edgeID[i]);
-    for(int i = 0 ; i < best_path[1].edgeID.size(); i++)
+    for(int i = 0 ; i < (int)best_path[1].edgeID.size(); i++)
         record_result(BACK_PATH, (unsigned short)best_path[1].edgeID[i]);
 
+    std::cout << best_path[0].cost << "\t" << best_path[1].cost << endl;
 }

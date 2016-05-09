@@ -70,7 +70,7 @@ void Ant::Init(Demand &demand, std::vector<EdgeList> adj_vec)
     for (int i = 0; i < N_NODE_COUNT; i++)
         m_nDemanNode[i] = 0;                        // 设置全部节点为非必须经过节点
 
-    for (int i = 0; i < deman_vec.size(); i++)
+    for (int i = 0; i < (int)deman_vec.size(); i++)
         m_nDemanNode[deman_vec[i]] = 1;             // 设置为必须经过节点
 
 
