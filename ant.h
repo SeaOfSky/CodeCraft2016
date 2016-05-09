@@ -9,7 +9,7 @@
 #include "graph.h"
 
 const double ALPHA = 1.0;   // 启发因子，信息素的重要程度
-const double BETA = 0.6;    // 期望因子，城市间距离的重要程度
+const double BETA = 0.6;    // 期望因子，节点间距离的重要程度
 const double ROU = 0.89;    // 信息素残留参数
 
 const double DBQ = 50.0;    //总的信息素

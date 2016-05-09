@@ -12,6 +12,7 @@
 
 #define MAX_NODE_NUM 2000               // 最大节点数量
 #define MAX(x,y) ((x)>(y)?(x):(y))      // 求较大值
+#define MIN(x,y) ((x)<(y)?(x):(y))      // 求较小值
 
 using namespace std;
 

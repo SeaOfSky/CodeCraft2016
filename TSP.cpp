@@ -7,8 +7,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <memory.h>
+#include <iostream>
 
-extern int N_NODE_COUNT; //城市数量
+extern int N_NODE_COUNT; //节点数量
 extern clock_t start_time;
 
 /*
@@ -40,7 +41,7 @@ void CTsp::InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Dist
     m_cBestAnt.m_dbPathLength = DB_MAX;
     N_NODE_COUNT = num_node;
 
-    // 计算两两城市间距离
+    // 计算两两节点间距离
     for (int i = 0; i < N_NODE_COUNT; i++)
     {
         for (int j = 0; j < N_NODE_COUNT; j++)
@@ -57,7 +58,7 @@ void CTsp::InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Dist
         }
     }
 
-    // 初始化环境信息素，先把城市间的信息素设置成一样
+    // 初始化环境信息素，先把节点间的信息素设置成一样
     // 这里设置成1.0，设置成多少对结果影响不是太大，对算法收敛速度有些影响
     for (int i = 0; i < N_NODE_COUNT; i++)
     {
@@ -69,6 +70,26 @@ void CTsp::InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Dist
 
 }
 
+
+/*
+ * 功能： 时间片分配函数
+ * 参数： time：        分配的时间
+ *       total_time：  总共可分配的时间
+ *       demand_num：  时间片分配个数
+ * 返回： 空
+ */
+void CTsp::TimeSplit(double * time, double total_time, vector<Demand> &demand_vec)
+{
+    int total_demand = 0;
+    for(int i = 0; i < (int)demand_vec.size(); i++)
+        total_demand += demand_vec[i].pass.size();
+
+    for(int i = 0; i < (int)demand_vec.size(); i++)
+        time[i] = total_time * demand_vec[i].pass.size() / total_demand;
+
+    time[1] += time[0];
+}
+
 /*
  * 功能： 更新环境信息素
  * 参数： g_Trial：    两两节点之间的信息素
@@ -76,7 +97,7 @@ void CTsp::InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Dist
  */
 void CTsp::UpdateTrial(double **g_Trial)
 {
-    // 临时数组，保存各只蚂蚁在两两城市间新留下的信息素
+    // 临时数组，保存各只蚂蚁在两两节点间新留下的信息素
     double **dbTempAry = (double **) malloc(sizeof(double *) * N_NODE_COUNT);
     for (int i = 0; i < N_NODE_COUNT; i++)
         dbTempAry[i] = (double *) malloc(sizeof(double) * N_NODE_COUNT);
@@ -94,7 +115,7 @@ void CTsp::UpdateTrial(double **g_Trial)
         {
             m = m_cAntAry[i].m_nPath[j];
             n = m_cAntAry[i].m_nPath[j - 1];
-            dbTempAry[n][m] = dbTempAry[n][m] + DBQ / m_cAntAry[i].m_dbPathLength;//城市n->城市m的信息素
+            dbTempAry[n][m] = dbTempAry[n][m] + DBQ / m_cAntAry[i].m_dbPathLength;//节点n->节点m的信息素
         }
     }
 
@@ -119,12 +140,17 @@ void CTsp::UpdateTrial(double **g_Trial)
  *       adj_vec：    图信息
  *       g_Distance： 两两节点间的距离
  *       g_Trial：    两两节点之间的信息素
- *       index：      查找的路径编号，两条路径平分10s时间
+ *       time：       运行的时间片分配
  * 返回： 空
  */
-void CTsp::Search(Demand &demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial, int index)
+void CTsp::Search(Demand &demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial, double time)
 {
     clock_t end_time;
+    int passCount = (int)demand.pass.size();
+//    passCount = MIN(passCount, 20);
+    double * cost_temp = (double *)malloc(size_t(sizeof(double) * passCount));
+
+    for(int  i = 0; i < passCount; i++) cost_temp[i] = DB_MAX;
 
     // 在迭代次数和总运行时间内进行循环
     for (int i = 0; i < N_IT_COUNT; i++)
@@ -147,19 +173,33 @@ void CTsp::Search(Demand &demand, std::vector<EdgeList> adj_vec, double **g_Dist
                 m_cBestAnt = m_cAntAry[j];
             }
         }
+        cost_temp[i % passCount] = m_cBestAnt.m_dbPathLength;
 
-//        if(m_cBestAnt.m_dbPathLength == DB_MAX)
-//            m_cBestAnt = temp_best_ant;
-//        else if(m_cBestAnt.m_dbPathLength == temp_min)
-//            break;
+        // 计算最近10次最优代价的方差
+        double average = 0, s2 = 0;
+        for(int k = 0; k < passCount; k++) average += cost_temp[k];
+        average /= 10;
+        for(int k = 0; k < passCount; k++) s2 += (cost_temp[k] - average) * (cost_temp[k] - average);
+
+        if(s2 <= CONVERGENCE && cost_temp[0] != DB_MAX) break;    // 如果方差小于判定条件，那么收敛，退出循环
+
+#ifdef _LOCAL_DEBUG
+        std::cout << "Gen: " << i << "average: " << average << " s2: " << s2 << endl;
+        for(int k = 0; k < 10; k++) std::cout << cost_temp[k] << " ";
+        std::cout << endl;
+#endif
 
         // 更新环境信息素
         UpdateTrial(g_Trial);
 
         // 如果时间用完，也退出搜索
         end_time = clock();
-        if ((double) (end_time - start_time) / CLOCKS_PER_SEC > (index + 1) * 5 - 1)
+        if (double(end_time - start_time) / CLOCKS_PER_SEC > time)
             break;
+
     }
 
+#ifdef _LOCAL_DEBUG
+    std::cout << "time: " << time << endl;
+#endif
 }
