@@ -88,3 +88,24 @@ vector<Demand> read_demand(char * demand[MAX_DEMAND_NUM], int demand_num)
     }
     return demand_list;
 }
+
+void repeat_count(vector<EdgeList> & adj_vec, int ** repeat, int num_node)
+{
+    for(int i = 0; i < num_node; i++)
+    {
+        for(int j = 0; j < num_node; j++) repeat[i][j] = 0;
+
+        EdgeList & edgeList = adj_vec[i];
+        int curr = -1;
+        for(int j = 0; j < edgeList.size(); j++)
+        {
+            if(edgeList[j].to != curr)
+            {
+                repeat[i][edgeList[j].to] = 1;
+                curr = edgeList[j].to;
+            }
+            else repeat[i][edgeList[j].to]++;
+        }
+    }
+
+}

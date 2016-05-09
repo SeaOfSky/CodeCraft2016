@@ -26,6 +26,33 @@ CTsp::~CTsp(void)
 {
 }
 
+/*
+ * 功能： 降低已选路径被再次选择的概率
+ * 参数： adj_vec：    图信息
+ *       list：       已经选择的节点
+ *       g_Trial：    两两节点之间的信息素
+ * 返回： 空
+ */
+void CTsp::UpdateAvoidNode(vector<EdgeList> & adj_vec, vector<int> & list, double **g_Trial, int **repeat)
+{
+    // 对于路径中的每条边，获取起点和终点，然后在邻接表中查找从起点到终点的边的数目
+    // 如果数目为1，那么应当尽量避开这个起点。如果数目大于1，那么就可以选择此节点。
+    if(list.size() < 2) return;
+
+    for (int i = 0; i < (int)list.size() - 1; i++)
+    {
+        int node = list[i], next = list[i + 1];
+        int count = 0;
+        EdgeList & edgeList = adj_vec[node];
+        for(int j = 0; j < (int)edgeList.size(); j++)    // 统计重边的条数
+            if(edgeList[j].to == next) count++;
+
+        if(count == 1 && repeat[node][next] == 1)        // 如果数目为1，那么应当尽量避开这个起点
+        {
+            g_Trial[node][next] = 0.5;
+        }
+    }
+}
 
 /*
  * 功能： 初始化数据
@@ -35,7 +62,7 @@ CTsp::~CTsp(void)
  *       g_Trial：    两两节点之间的信息素
  * 返回： 空
  */
-void CTsp::InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial)
+void CTsp::InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial, vector<int> & list, int **repeat)
 {
     // 先把最优蚂蚁的路径长度设置成一个很大的值
     m_cBestAnt.m_dbPathLength = DB_MAX;
@@ -67,6 +94,8 @@ void CTsp::InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Dist
             g_Trial[i][j] = 1.0;
         }
     }
+
+    UpdateAvoidNode(adj_vec, list, g_Trial, repeat);
 
 }
 
@@ -100,7 +129,7 @@ void CTsp::UpdateTrial(double **g_Trial)
     // 临时数组，保存各只蚂蚁在两两节点间新留下的信息素
     double **dbTempAry = (double **) malloc(sizeof(double *) * N_NODE_COUNT);
     for (int i = 0; i < N_NODE_COUNT; i++)
-        dbTempAry[i] = (double *) malloc(sizeof(double) * N_NODE_COUNT);
+        dbTempAry[i]   = (double *) malloc(sizeof(double) * N_NODE_COUNT);
 
     for (int i = 0; i < N_NODE_COUNT; i++)
         for (int j = 0; j < N_NODE_COUNT; j++)
@@ -146,8 +175,9 @@ void CTsp::UpdateTrial(double **g_Trial)
 void CTsp::Search(Demand &demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial, double time)
 {
     clock_t end_time;
+//    int passCount = 15;
     int passCount = (int)demand.pass.size();
-//    passCount = MIN(passCount, 20);
+    passCount = MIN(passCount, 10);
     double * cost_temp = (double *)malloc(size_t(sizeof(double) * passCount));
 
     for(int  i = 0; i < passCount; i++) cost_temp[i] = DB_MAX;

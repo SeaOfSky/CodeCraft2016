@@ -48,4 +48,6 @@ extern vector<EdgeList> read_graph(char *topo[MAX_EDGE_NUM], int edge_num);
 
 extern vector<Demand> read_demand(char *demand[MAX_DEMAND_NUM], int demand_num);
 
+extern void repeat_count(vector<EdgeList> & adj_vec, int ** repeat, int num_node);
+
 #endif //FUTURE_NET_GRAPH_H
