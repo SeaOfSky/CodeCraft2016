@@ -129,6 +129,9 @@ int Ant::ChooseNextNode(double **g_Distance, double **g_Trial, int deman_count, 
             if ((deman_count != deman_node_count) && (i == end))            // 若需要经过的点还没走完且选择的新节点是终点，则该点不走
                 prob[i] = 0.0;
 
+            if(!visitable[m_nCurNodeNo][i])
+                prob[i] = 0.0;
+
             dbTotal = dbTotal + prob[i];                                    // 累加信息素，得到总和
         }
         else                                                                // 如果节点去过了，则其被选中的概率值为0

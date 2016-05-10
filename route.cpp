@@ -15,6 +15,8 @@ clock_t start_time;     // 程序开始时间
 std::vector<EdgeList> adj_vec;
 std::vector<Demand> deman_vec;
 std::vector<Edge> edge_vec;
+int ** repeat;
+bool ** visitable;
 
 Path NodenoIndexPath(Ant m_cBestAnt)
 {
@@ -37,7 +39,7 @@ Path NodenoIndexPath(Ant m_cBestAnt)
     return best_path;
 }
 
-Path replacePath(Path & prevPath, Path & currPath, int ** repeat, int num_node)
+void replacePath(Path & prevPath, Path & currPath, int ** repeat, int num_node)
 {
     bool ** select = (bool **)malloc(sizeof(bool*)*num_node);
     for(int i = 0; i < num_node; i++)
@@ -75,15 +77,19 @@ void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAN
 
     read_graph(topo, edge_num);         // 读取topo信息到邻接表
     read_demand(demand, demand_num);    // 读取必经节点信息
-    std::vector<int> avoid_node;                                        // 需要避开的节点信息
+    std::vector<int> avoid_path;                                        // 需要避开的节点信息
 
     Path best_path[2];                                                  // 存储最优路径信息
     double time[2];                                                     // 时间片分配
     int num_node = (int)adj_vec.size();                                 // 节点数
 
-    int ** repeat = (int **) malloc(sizeof(int *) * num_node);
+    repeat = (int **) malloc(sizeof(int *) * num_node);
+    visitable = (bool **)malloc(sizeof(bool *) * num_node);
     for (int i = 0; i < num_node; i++)
+    {
         repeat[i] = (int *) malloc(sizeof(int) * num_node);
+        visitable[i] = (bool *)malloc(sizeof(bool) * num_node);
+    }
     repeat_count(repeat, num_node);
 
     for(int index = 0; index < demand_num; index++)
@@ -99,14 +105,14 @@ void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAN
         }
 
         CTsp tsp;
-        tsp.InitData(num_node, g_Distance, g_Trial, avoid_node, repeat); // 初始化
-        tsp.TimeSplit(time, 9.5, deman_vec);                                      // 分配时间片
+        tsp.InitData(num_node, g_Distance, g_Trial, avoid_path);         // 初始化
+        tsp.TimeSplit(time, 9.5, deman_vec);                             // 分配时间片
         tsp.Search(deman_vec[index], g_Distance, g_Trial, time[index]);  // 开始搜索
         best_path[index] = NodenoIndexPath(tsp.m_cBestAnt);              // 提取最优路径信息
-        avoid_node = best_path[index].nodeID;
+        avoid_path = best_path[index].edgeID;
         update_cost(best_path[0]);
 
-        for(int i = 0; i < num_node; i++)                                         // 释放资源
+        for(int i = 0; i < num_node; i++)                                // 释放资源
         {
             free(g_Trial[i]);
             free(g_Distance[i]);

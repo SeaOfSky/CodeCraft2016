@@ -18,6 +18,8 @@ const double DB_MAX = 10e9; //一个标志数，10的9次方
 extern std::vector<EdgeList> adj_vec;
 extern std::vector<Demand> deman_vec;
 extern std::vector<Edge> edge_vec;
+extern int ** repeat;
+extern bool ** visitable;
 
 //定义蚂蚁类
 class Ant

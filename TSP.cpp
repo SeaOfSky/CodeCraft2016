@@ -33,23 +33,25 @@ CTsp::~CTsp(void)
  *       g_Trial：    两两节点之间的信息素
  * 返回： 空
  */
-void CTsp::UpdateAvoidNode(vector<int> & list, double **g_Trial, int **repeat)
+void CTsp::UpdateAvoidPath(vector<int> & list, double **g_Trial)
 {
     // 对于路径中的每条边，获取起点和终点，然后在邻接表中查找从起点到终点的边的数目
     // 如果数目为1，那么应当尽量避开这个起点。如果数目大于1，那么就可以选择此节点。
     if(list.size() < 2) return;
 
-    for (int i = 0; i < (int)list.size() - 1; i++)
+    for (int i = 0; i < (int)list.size(); i++)
     {
-        int node = list[i], next = list[i + 1];
+        int from = edge_vec[list[i]].from;
+        int to   = edge_vec[list[i]].to;
         int count = 0;
-        EdgeList & edgeList = adj_vec[node];
+        EdgeList & edgeList = adj_vec[from];
         for(int j = 0; j < (int)edgeList.size(); j++)    // 统计重边的条数
-            if(edgeList[j].to == next) count++;
+            if(edgeList[j].to == to) count++;
 
-        if(count == 1 && repeat[node][next] == 1)        // 如果数目为1，那么应当尽量避开这个起点
+        if(count == 1 && repeat[from][to] == 1)          // 如果数目为1，那么应当尽量避开这个起点
         {
-            g_Trial[node][next] = 0.5;
+            g_Trial[from][to] = 0;
+            visitable[from][to] = false;
         }
     }
 }
@@ -62,7 +64,7 @@ void CTsp::UpdateAvoidNode(vector<int> & list, double **g_Trial, int **repeat)
  *       g_Trial：    两两节点之间的信息素
  * 返回： 空
  */
-void CTsp::InitData(int num_node, double **g_Distance, double **g_Trial, vector<int> & list, int **repeat)
+void CTsp::InitData(int num_node, double **g_Distance, double **g_Trial, vector<int> & list)
 {
     // 先把最优蚂蚁的路径长度设置成一个很大的值
     m_cBestAnt.m_dbPathLength = DB_MAX;
@@ -74,6 +76,7 @@ void CTsp::InitData(int num_node, double **g_Distance, double **g_Trial, vector<
         for (int j = 0; j < N_NODE_COUNT; j++)
         {
             g_Distance[i][j] = DB_MAX;
+            visitable[i][j] = true;
         }
     }
     EdgeList::iterator adj_it;
@@ -97,7 +100,7 @@ void CTsp::InitData(int num_node, double **g_Distance, double **g_Trial, vector<
         }
     }
 
-    UpdateAvoidNode(list, g_Trial, repeat);
+    UpdateAvoidPath(list, g_Trial);
 
 }
 
@@ -179,7 +182,7 @@ void CTsp::Search(Demand &demand, double **g_Distance, double **g_Trial, double 
     clock_t end_time;
 //    int passCount = 15;
     int passCount = (int)demand.pass.size();
-    passCount = MIN(passCount, 10);
+    passCount = MIN(passCount, 20);
     double * cost_temp = (double *)malloc(size_t(sizeof(double) * passCount));
 
     for(int  i = 0; i < passCount; i++) cost_temp[i] = DB_MAX;
