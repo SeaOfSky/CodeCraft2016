@@ -33,7 +33,7 @@ CTsp::~CTsp(void)
  *       g_Trial：    两两节点之间的信息素
  * 返回： 空
  */
-void CTsp::UpdateAvoidNode(vector<EdgeList> & adj_vec, vector<int> & list, double **g_Trial, int **repeat)
+void CTsp::UpdateAvoidNode(vector<int> & list, double **g_Trial, int **repeat)
 {
     // 对于路径中的每条边，获取起点和终点，然后在邻接表中查找从起点到终点的边的数目
     // 如果数目为1，那么应当尽量避开这个起点。如果数目大于1，那么就可以选择此节点。
@@ -62,7 +62,7 @@ void CTsp::UpdateAvoidNode(vector<EdgeList> & adj_vec, vector<int> & list, doubl
  *       g_Trial：    两两节点之间的信息素
  * 返回： 空
  */
-void CTsp::InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial, vector<int> & list, int **repeat)
+void CTsp::InitData(int num_node, double **g_Distance, double **g_Trial, vector<int> & list, int **repeat)
 {
     // 先把最优蚂蚁的路径长度设置成一个很大的值
     m_cBestAnt.m_dbPathLength = DB_MAX;
@@ -81,7 +81,9 @@ void CTsp::InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Dist
     {
         for (adj_it = adj_vec[i].begin(); adj_it != adj_vec[i].end(); adj_it++)
         {
-            g_Distance[i][adj_it->to] = adj_it->cost;
+//            g_Distance[i][adj_it->to] = 1;
+//            g_Distance[i][adj_it->to] = adj_it->cost;
+            g_Distance[i][adj_it->to] = MIN(adj_it->cost, g_Distance[i][adj_it->to]);
         }
     }
 
@@ -95,7 +97,7 @@ void CTsp::InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Dist
         }
     }
 
-    UpdateAvoidNode(adj_vec, list, g_Trial, repeat);
+    UpdateAvoidNode(list, g_Trial, repeat);
 
 }
 
@@ -172,7 +174,7 @@ void CTsp::UpdateTrial(double **g_Trial)
  *       time：       运行的时间片分配
  * 返回： 空
  */
-void CTsp::Search(Demand &demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial, double time)
+void CTsp::Search(Demand &demand, double **g_Distance, double **g_Trial, double time)
 {
     clock_t end_time;
 //    int passCount = 15;
@@ -190,7 +192,7 @@ void CTsp::Search(Demand &demand, std::vector<EdgeList> adj_vec, double **g_Dist
         // 每只蚂蚁搜索一遍
         for (int j = 0; j < N_ANT_COUNT; j++)
         {
-            m_cAntAry[j].Search(demand, adj_vec, g_Distance, g_Trial);
+            m_cAntAry[j].Search(demand, g_Distance, g_Trial);
             if (m_cAntAry[j].m_dbPathLength == DB_MAX)
                 dead_ants++;
         }
@@ -208,7 +210,7 @@ void CTsp::Search(Demand &demand, std::vector<EdgeList> adj_vec, double **g_Dist
         // 计算最近10次最优代价的方差
         double average = 0, s2 = 0;
         for(int k = 0; k < passCount; k++) average += cost_temp[k];
-        average /= 10;
+        average /= passCount;
         for(int k = 0; k < passCount; k++) s2 += (cost_temp[k] - average) * (cost_temp[k] - average);
 
         if(s2 <= CONVERGENCE && cost_temp[0] != DB_MAX) break;    // 如果方差小于判定条件，那么收敛，退出循环

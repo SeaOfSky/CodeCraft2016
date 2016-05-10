@@ -13,6 +13,10 @@ const int N_ANT_COUNT = 20;     // 蚂蚁数量
 const int N_IT_COUNT = 10000;   // 迭代次数
 const double CONVERGENCE = 10;  // 收敛判定条件，方差
 
+extern std::vector<EdgeList> adj_vec;
+extern std::vector<Demand> deman_vec;
+extern std::vector<Edge> edge_vec;
+
 //tsp类
 class CTsp
 {
@@ -27,10 +31,10 @@ public:
 
 public:
 
-    void InitData(int num_node, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial, vector<int> &, int **repeat); // 初始化数据
-    void UpdateAvoidNode(vector<EdgeList> & adj_vec, vector<int> & list, double **g_Trial, int ** repeat);
+    void InitData(int num_node, double **g_Distance, double **g_Trial, vector<int> &, int **repeat); // 初始化数据
+    void UpdateAvoidNode(vector<int> & list, double **g_Trial, int ** repeat);
     void TimeSplit(double * time, double total_time, vector<Demand> &demand_vec);       // 时间片分配函数
-    void Search(Demand & demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial, double time);  // 搜索路径
+    void Search(Demand & demand, double **g_Distance, double **g_Trial, double time);  // 搜索路径
     void UpdateTrial(double **g_Trial);                                                 // 更新信息素
 };
 

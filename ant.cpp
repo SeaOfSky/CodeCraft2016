@@ -44,7 +44,7 @@ Ant::~Ant(void)
  *       adj_vec： 图的邻接表
  * 返回： 空
  */
-void Ant::Init(Demand &demand, std::vector<EdgeList> adj_vec)
+void Ant::Init(Demand &demand)
 {
     std::vector<int> deman_vec = demand.pass;
 
@@ -106,6 +106,7 @@ int Ant::ChooseNextNode(double **g_Distance, double **g_Trial, int deman_count, 
     {
         if ((m_nAllowedNode[i] == 1) && (g_Distance[m_nCurNodeNo][i] != DB_MAX))    // 可去的并且没有去过的节点
         {
+//            Total += pow(g_Trial[m_nCurNodeNo][i], ALPHA) * pow(1.0, BETA);
             Total += pow(g_Trial[m_nCurNodeNo][i], ALPHA) * pow(1.0 / g_Distance[m_nCurNodeNo][i], BETA);
         }
     }
@@ -119,9 +120,9 @@ int Ant::ChooseNextNode(double **g_Distance, double **g_Trial, int deman_count, 
                 prob[i] = 0.8;
             }
             else                                                            // 非必经节点按照公式计算
-            {
-                prob[i] = pow(g_Trial[m_nCurNodeNo][i], ALPHA) *
-                          pow(1.0 / g_Distance[m_nCurNodeNo][i], BETA);     // 该节点和当前节点间的信息素
+            {                                                               // 该节点和当前节点间的信息素
+//                prob[i] = pow(g_Trial[m_nCurNodeNo][i], ALPHA) * pow(1.0, BETA);
+                prob[i] = pow(g_Trial[m_nCurNodeNo][i], ALPHA) * pow(1.0 / g_Distance[m_nCurNodeNo][i], BETA);
             }
 
 
@@ -192,7 +193,7 @@ bool Ant::Move(double **g_Distance, double **g_Trial, int deman_count, int deman
 {
     int nNodeNo = ChooseNextNode(g_Distance, g_Trial, deman_count, deman_node_count); // 选择下一个节点
 
-    if (nNodeNo == -1) return false;            // 如果节点号为 -1 直接返回，蚂蚁无路可走
+    if (nNodeNo == -1) return false;        // 如果节点号为 -1 直接返回，蚂蚁无路可走
 
     m_nPath[m_nMovedNodeCount] = nNodeNo;   // 保存蚂蚁走的路径
     m_nAllowedNode[nNodeNo] = 0;            // 把这个节点设置成已经去过了
@@ -210,9 +211,9 @@ bool Ant::Move(double **g_Distance, double **g_Trial, int deman_count, int deman
  *       g_Trial：          两两节点间的信息素
  * 返回： 空
  */
-void Ant::Search(Demand &demand, std::vector<EdgeList> adj_vec, double **g_Distance, double **g_Trial)
+void Ant::Search(Demand &demand, double **g_Distance, double **g_Trial)
 {
-    Init(demand, adj_vec);                          // 蚂蚁搜索前，先初始化
+    Init(demand);                          // 蚂蚁搜索前，先初始化
 
     std::vector<int> deman_vec = demand.pass;
 
@@ -228,13 +229,6 @@ void Ant::Search(Demand &demand, std::vector<EdgeList> adj_vec, double **g_Dista
             if (pre_it != deman_vec.end())
             {
                 m_dbPathLength = DB_MAX;
-
-                //输出路径
-                //printf("%d\n", m_nCurNodeNo);
-                //for (int i = 0; i < m_nMovedNodeCount; i++)
-                //	printf("%d->", m_nPath[i]);
-                //printf("\n\n");
-
                 return;
             }
             m_nCurNodeNo = m_nPath[m_nMovedNodeCount - 2];
@@ -253,11 +247,7 @@ void Ant::Search(Demand &demand, std::vector<EdgeList> adj_vec, double **g_Dista
         {
             deman_count++;
         }
-        //if ((deman_count != demaN_NODE_COUNT) && (m_nCurNodeNo == en))
-        //{
-        //	m_dbPathLength = DB_MAX;
-        //	return;
-        //}
+
     }
 
     //完成搜索后计算走过的路径长度

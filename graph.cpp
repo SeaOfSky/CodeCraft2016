@@ -8,7 +8,7 @@
 
 using namespace std;
 
-vector<EdgeList> read_graph(char * topo[MAX_EDGE_NUM], int edge_num)
+void read_graph(char * topo[MAX_EDGE_NUM], int edge_num)
 {
     vector<EdgeList> graph(MAX_NODE_NUM);
     int max_node = -1;
@@ -29,6 +29,7 @@ vector<EdgeList> read_graph(char * topo[MAX_EDGE_NUM], int edge_num)
         edge_temp.from = edge_info[1];
         edge_temp.to = edge_info[2];
         edge_temp.cost = edge_info[3];
+        edge_vec.push_back(edge_temp);
 
         max_node = MAX(max_node, edge_temp.from);
 
@@ -56,12 +57,11 @@ vector<EdgeList> read_graph(char * topo[MAX_EDGE_NUM], int edge_num)
     }
 
     graph.resize((size_t)max_node + 1);
-    return graph;
+    adj_vec = graph;
 }
 
-vector<Demand> read_demand(char * demand[MAX_DEMAND_NUM], int demand_num)
+void read_demand(char * demand[MAX_DEMAND_NUM], int demand_num)
 {
-    vector<Demand> demand_list;
     for(int i = 0; i < demand_num; i++)
     {
         Demand temp;
@@ -84,12 +84,11 @@ vector<Demand> read_demand(char * demand[MAX_DEMAND_NUM], int demand_num)
             str = strtok(NULL, "|");
         }
 
-        demand_list.push_back(temp);
+        deman_vec.push_back(temp);
     }
-    return demand_list;
 }
 
-void repeat_count(vector<EdgeList> & adj_vec, int ** repeat, int num_node)
+void repeat_count(int ** repeat, int num_node)
 {
     for(int i = 0; i < num_node; i++)
     {
@@ -97,7 +96,7 @@ void repeat_count(vector<EdgeList> & adj_vec, int ** repeat, int num_node)
 
         EdgeList & edgeList = adj_vec[i];
         int curr = -1;
-        for(int j = 0; j < edgeList.size(); j++)
+        for(int j = 0; j < (int)edgeList.size(); j++)
         {
             if(edgeList[j].to != curr)
             {
@@ -108,4 +107,33 @@ void repeat_count(vector<EdgeList> & adj_vec, int ** repeat, int num_node)
         }
     }
 
+}
+
+void update_cost(Path & path)
+{
+    for(int i = 0; i < (int)path.edgeID.size(); i++)
+    {
+        int from = edge_vec[path.edgeID[i]].from;
+        int to = edge_vec[path.edgeID[i]].to;
+        EdgeList & list = adj_vec[from];
+
+        int max_cost = 0;
+        for(int j = 0; j < (int)list.size(); j++)
+            max_cost = MAX(list[j].cost, max_cost);
+
+        for(int j = 0; j < (int)list.size(); j++)
+        {
+            if(list[j].to == to)
+            {
+                list[j].cost = max_cost;
+                if(j+1 < (int)list.size() && list[j+1].to == to)
+                {
+                    Edge temp = list[j];
+                    list[j] = list[j+1];
+                    list[j+1] = temp;
+                }
+                break;
+            }
+        }
+    }
 }

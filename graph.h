@@ -44,10 +44,16 @@ typedef struct Demand       // 必经节点信息
 
 typedef vector<Edge> EdgeList;
 
-extern vector<EdgeList> read_graph(char *topo[MAX_EDGE_NUM], int edge_num);
+extern std::vector<EdgeList> adj_vec;
+extern std::vector<Demand> deman_vec;
+extern std::vector<Edge> edge_vec;
 
-extern vector<Demand> read_demand(char *demand[MAX_DEMAND_NUM], int demand_num);
+extern void read_graph(char *topo[MAX_EDGE_NUM], int edge_num);
 
-extern void repeat_count(vector<EdgeList> & adj_vec, int ** repeat, int num_node);
+extern void read_demand(char *demand[MAX_DEMAND_NUM], int demand_num);
+
+extern void repeat_count(int ** repeat, int num_node);
+
+extern void update_cost(Path & path);
 
 #endif //FUTURE_NET_GRAPH_H
