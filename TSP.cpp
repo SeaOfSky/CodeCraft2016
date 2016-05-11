@@ -183,6 +183,7 @@ void CTsp::Search(Demand &demand, double **g_Distance, double **g_Trial, double 
 //    int passCount = 15;
     int passCount = (int)demand.pass.size();
     passCount = MIN(passCount, 20);
+    passCount = MAX(passCount, 1);
     double * cost_temp = (double *)malloc(size_t(sizeof(double) * passCount));
 
     for(int  i = 0; i < passCount; i++) cost_temp[i] = DB_MAX;

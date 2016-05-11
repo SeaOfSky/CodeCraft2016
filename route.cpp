@@ -70,6 +70,15 @@ void replacePath(Path & prevPath, Path & currPath, int ** repeat, int num_node)
     }
 }
 
+int samepath_calc(Path & p1, Path & p2)
+{
+    int count = 0;
+    for(int i = 0; i < (int)p1.edgeID.size(); i++)
+        if(find(p2.edgeID.begin(), p2.edgeID.end(), p1.edgeID[i]) != p2.edgeID.end())
+            count++;
+    return count;
+}
+
 //你要完成的功能总入口
 void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAND_NUM], int demand_num)
 {
@@ -128,5 +137,7 @@ void search_route(char *topo[MAX_EDGE_NUM], int edge_num, char *demand[MAX_DEMAN
     for(int i = 0 ; i < (int)best_path[1].edgeID.size(); i++)
         record_result(BACK_PATH, (unsigned short)best_path[1].edgeID[i]);
 
-    std::cout << best_path[0].cost << "\t" << best_path[1].cost << endl;
+    std::cout << "cost1: " << best_path[0].cost << "\t"
+              << "cost2: " << best_path[1].cost << "\t"
+              << "same: " << samepath_calc(best_path[0], best_path[1]) << endl;
 }

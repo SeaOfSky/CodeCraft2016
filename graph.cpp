@@ -77,6 +77,12 @@ void read_demand(char * demand[MAX_DEMAND_NUM], int demand_num)
         temp.start = atoi(split[1]);
         temp.end = atoi(split[2]);
 
+        if(strcmp("NA", split[3]) == 0 || strcmp("NA\n", split[3]) == 0)
+        {
+            deman_vec.push_back(temp);
+            continue;
+        }
+
         str = strtok(split[3], "|");
         while(str)
         {

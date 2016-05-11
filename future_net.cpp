@@ -6,9 +6,9 @@
 int main(int argc, char *argv[])
 {
 
-//    argv[1] = "/home/duanxu/ClionProjects/CodeCraft/test/case0/topo.csv";
-//    argv[2] = "/home/duanxu/ClionProjects/CodeCraft/test/case0/demand.csv";
-//    argv[3] = "/home/duanxu/ClionProjects/CodeCraft/test/case0/result.csv";
+//    argv[1] = "/home/duanxu/ClionProjects/CodeCraft/test/case6/topo.csv";
+//    argv[2] = "/home/duanxu/ClionProjects/CodeCraft/test/case6/demand.csv";
+//    argv[3] = "/home/duanxu/ClionProjects/CodeCraft/test/case6/result.csv";
 
     print_time("Begin");
     char *topo[MAX_EDGE_NUM];
