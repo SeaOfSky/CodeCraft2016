@@ -1,0 +1,16 @@
+cost1: 4	cost2: 5	same: 0
+cost1: 71	cost2: 141	same: 0
+cost1: 3	cost2: 3	same: 0
+cost1: 641	cost2: 1023	same: 1
+cost1: 34940	cost2: 36412	same: 2
+cost1: 0	cost2: 0	same: 0
+cost1: 62	cost2: 20	same: 0
+cost1: 1549	cost2: 1627	same: 0
+cost1: 0	cost2: 0	same: 0
+cost1: 40256	cost2: 37000	same: 0
+Please input valid topo file.
+Please input valid topo file.
+Please input valid topo file.
+Please input valid topo file.
+Please input valid topo file.
+Please input valid topo file.
